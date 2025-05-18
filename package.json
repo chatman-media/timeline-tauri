@@ -75,7 +75,7 @@
     "@eslint/js": "^9.27.0",
     "@next/eslint-plugin-next": "^15.3.2",
     "@playwright/test": "^1.52.0",
-    "@rollup/rollup-linux-x64-gnu": "^4.9.6",
+    "@rollup/rollup-linux-x64-gnu": "^4.41.0",
     "@tailwindcss/postcss": "^4.1.7",
     "@tauri-apps/cli": "^2.5.0",
     "@testing-library/jest-dom": "^6.6.3",

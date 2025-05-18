@@ -38,6 +38,12 @@ jobs:
       - name: Install dependencies from lockfile
         run: npm ci
 
+      - name: Fix Rollup dependencies on Linux
+        if: runner.os == 'Linux'
+        run: |
+          npm install @rollup/rollup-linux-x64-gnu
+          echo "ROLLUP_SKIP_NODEJS_NATIVE=1" >> $GITHUB_ENV
+
       - name: Run lint step on Unix
         if: runner.os != 'Windows'
         run: npm run lint

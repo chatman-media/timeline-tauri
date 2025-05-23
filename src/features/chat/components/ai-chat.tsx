@@ -1,41 +1,49 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Bot, Send, SendHorizonal, StopCircle, User } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import { Bot, Send, SendHorizonal, StopCircle, User } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
-import { useModal } from "@/features/modals"
-import { useUserSettings } from "@/features/modals/features/user-settings/user-settings-provider"
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
+import { useModal } from "@/features/modals";
+import { useUserSettings } from "@/features/modals/features/user-settings/user-settings-provider";
 
-import { useChat } from ".."
-import { CLAUDE_MODELS } from "./claude-service"
-import { AI_MODELS } from "./open-ai-service"
+import { useChat } from "..";
+import { CLAUDE_MODELS } from "./claude-service";
+import { AI_MODELS } from "./open-ai-service";
 
 // Интерфейс для сообщений чата
 export interface ChatMessage {
-  id: string
-  text: string
-  sender: "user" | "agent"
-  agentId?: string
-  timestamp: string
-  isProcessing?: boolean
+  id: string;
+  text: string;
+  sender: "user" | "agent";
+  agentId?: string;
+  timestamp: string;
+  isProcessing?: boolean;
 }
 // Типы сообщений
 export interface AiMessage {
-  role: "user" | "assistant" | "system"
-  content: string
+  role: "user" | "assistant" | "system";
+  content: string;
 }
 
 const AVAILABLE_AGENTS = [
-  { id: CLAUDE_MODELS.CLAUDE_4_SONNET, name: "Claude 4 Sonnet", useTools: true },
+  {
+    id: CLAUDE_MODELS.CLAUDE_4_SONNET,
+    name: "Claude 4 Sonnet",
+    useTools: true,
+  },
   { id: CLAUDE_MODELS.CLAUDE_4_OPUS, name: "Claude 4 Opus", useTools: true },
   { id: AI_MODELS.GPT_4, name: "GPT-4", useTools: false },
   { id: AI_MODELS.GPT_3_5, name: "GPT-3.5 Turbo", useTools: false },
-]
+];
 
 export function AiChat() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const {
     chatMessages,
     sendChatMessage,
@@ -44,62 +52,65 @@ export function AiChat() {
     selectAgent,
     isProcessing,
     setProcessing,
-  } = useChat()
-  const { openAiApiKey } = useUserSettings()
-  const { openModal } = useModal()
+  } = useChat();
+  const { openAiApiKey } = useUserSettings();
+  const { openModal } = useModal();
 
-  const [message, setMessage] = useState("")
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const [message, setMessage] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Прокрутка к последнему сообщению
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   // Функция для автоматического изменения высоты textarea
   const autoResizeTextarea = useCallback(() => {
     if (inputRef.current) {
       // Сбрасываем высоту до минимальной
-      inputRef.current.style.height = "auto"
+      inputRef.current.style.height = "auto";
       // Устанавливаем высоту по содержимому (scrollHeight)
-      const newHeight = Math.min(Math.max(40, inputRef.current.scrollHeight), 120) // Минимум 40px, максимум 120px
-      inputRef.current.style.height = `${newHeight}px`
+      const newHeight = Math.min(
+        Math.max(40, inputRef.current.scrollHeight),
+        120,
+      ); // Минимум 40px, максимум 120px
+      inputRef.current.style.height = `${newHeight}px`;
     }
-  }, [inputRef])
+  }, [inputRef]);
 
   // Прокрутка при добавлении новых сообщений
   useEffect(() => {
-    scrollToBottom()
-  }, [chatMessages, scrollToBottom])
+    scrollToBottom();
+  }, [chatMessages, scrollToBottom]);
 
   // Инициализация автоматического изменения высоты textarea
   useEffect(() => {
     // Вызываем функцию при монтировании компонента
-    autoResizeTextarea()
-  }, [autoResizeTextarea])
+    autoResizeTextarea();
+  }, [autoResizeTextarea]);
 
   // Обработчик отправки сообщения
   const handleSendMessage = useCallback(() => {
-    if (!message.trim() || isProcessing) return
+    if (!message.trim() || isProcessing) return;
 
     // Проверяем, установлен ли API ключ
     if (!openAiApiKey) {
       // Если API ключ не установлен, показываем диалог настроек
-      openModal("user-settings")
-      return
+      openModal("user-settings");
+      return;
     }
 
     // Отправляем сообщение пользователя
-    sendChatMessage(message)
-    setMessage("")
-    setProcessing(true)
+    sendChatMessage(message);
+    setMessage("");
+    setProcessing(true);
 
     // Сбрасываем высоту textarea после очистки
-    setTimeout(autoResizeTextarea, 0)
+    setTimeout(autoResizeTextarea, 0);
 
     // Фокус на поле ввода
-    inputRef.current?.focus()
+    inputRef.current?.focus();
 
     // Симуляция ответа ИИ (пока без реального API)
     setTimeout(() => {
@@ -109,11 +120,11 @@ export function AiChat() {
         sender: "agent",
         agentId: selectedAgentId || undefined,
         timestamp: new Date().toISOString(),
-      }
+      };
 
-      receiveChatMessage(agentMessage)
-      setProcessing(false)
-    }, 1000)
+      receiveChatMessage(agentMessage);
+      setProcessing(false);
+    }, 1000);
   }, [
     message,
     sendChatMessage,
@@ -124,29 +135,29 @@ export function AiChat() {
     openAiApiKey,
     openModal,
     setProcessing,
-  ])
+  ]);
 
   // Обработчик остановки обработки
   const handleStopProcessing = useCallback(() => {
-    setProcessing(false)
-  }, [setProcessing])
+    setProcessing(false);
+  }, [setProcessing]);
 
   // Обработчик нажатия Enter
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault()
-        handleSendMessage()
+        e.preventDefault();
+        handleSendMessage();
       }
     },
     [handleSendMessage],
-  )
+  );
 
   // Форматирование времени
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp)
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  }
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
 
   return (
     <TooltipProvider>
@@ -163,7 +174,9 @@ export function AiChat() {
                 <div
                   key={msg.id}
                   className={`group flex max-w-[90%] flex-col rounded-lg p-2.5 ${
-                    msg.sender === "user" ? "ml-auto bg-[#2563eb] text-white" : "bg-[#2a2a2a] text-white"
+                    msg.sender === "user"
+                      ? "ml-auto bg-[#2563eb] text-white"
+                      : "bg-[#2a2a2a] text-white"
                   }`}
                 >
                   <div className="flex items-start gap-2">
@@ -210,12 +223,15 @@ export function AiChat() {
                   ref={inputRef}
                   value={message}
                   onChange={(e) => {
-                    setMessage(e.target.value)
+                    setMessage(e.target.value);
                     // Вызываем функцию изменения высоты при изменении текста
-                    setTimeout(autoResizeTextarea, 0)
+                    setTimeout(autoResizeTextarea, 0);
                   }}
                   onKeyDown={handleKeyDown}
-                  placeholder={t("timeline.chat.messagePlaceholder", "Type your message here...")}
+                  placeholder={t(
+                    "timeline.chat.messagePlaceholder",
+                    "Type your message here...",
+                  )}
                   className="min-h-[40px] w-full resize-none rounded-md border border-[#444] bg-[#2a2a2a] py-2 pr-10 pl-3 text-sm text-white focus:outline-none"
                   disabled={isProcessing}
                   rows={1}
@@ -236,7 +252,9 @@ export function AiChat() {
                         <StopCircle className="h-4 w-4" />
                       </Button>
                       <TooltipContent id="stop-tooltip" side="top">
-                        <p className="text-xs">{t("timeline.chat.stop", "Остановить")}</p>
+                        <p className="text-xs">
+                          {t("timeline.chat.stop", "Остановить")}
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   ) : (
@@ -253,7 +271,9 @@ export function AiChat() {
                         <Send className="h-4 w-4" />
                       </Button>
                       <TooltipContent id="send-tooltip" side="top">
-                        <p className="text-xs">{t("timeline.chat.send", "Отправить")}</p>
+                        <p className="text-xs">
+                          {t("timeline.chat.send", "Отправить")}
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   )}
@@ -270,20 +290,31 @@ export function AiChat() {
                   onClick={() => {
                     // Если API ключ не установлен, показываем диалог настроек
                     if (!openAiApiKey) {
-                      openModal("user-settings")
-                      return
+                      openModal("user-settings");
+                      return;
                     }
 
                     // Открываем выпадающий список при клике
-                    const nextAgentIndex = AVAILABLE_AGENTS.findIndex((a) => a.id === selectedAgentId) + 1
-                    const nextAgent = AVAILABLE_AGENTS[nextAgentIndex >= AVAILABLE_AGENTS.length ? 0 : nextAgentIndex]
-                    selectAgent(nextAgent.id)
+                    const nextAgentIndex =
+                      AVAILABLE_AGENTS.findIndex(
+                        (a) => a.id === selectedAgentId,
+                      ) + 1;
+                    const nextAgent =
+                      AVAILABLE_AGENTS[
+                        nextAgentIndex >= AVAILABLE_AGENTS.length
+                          ? 0
+                          : nextAgentIndex
+                      ];
+                    selectAgent(nextAgent.id);
                   }}
                   className="h-10 w-full resize-none rounded-md border border-[#444] bg-[#2a2a2a] px-3 py-2 text-sm text-white hover:bg-[#333] focus:outline-none"
                   value={
                     selectedAgentId
                       ? `${AVAILABLE_AGENTS.find((a) => a.id === selectedAgentId)?.name}${
-                          AVAILABLE_AGENTS.find((a) => a.id === selectedAgentId)?.useTools ? " (с инструментами)" : ""
+                          AVAILABLE_AGENTS.find((a) => a.id === selectedAgentId)
+                            ?.useTools
+                            ? " (с инструментами)"
+                            : ""
                         }`
                       : `${AVAILABLE_AGENTS[0].name}${AVAILABLE_AGENTS[0].useTools ? " (с инструментами)" : ""}`
                   }
@@ -297,5 +328,5 @@ export function AiChat() {
         </div>
       </div>
     </TooltipProvider>
-  )
+  );
 }

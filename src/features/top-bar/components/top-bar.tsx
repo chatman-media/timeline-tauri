@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from "react";
 
 import {
   FolderOpen,
@@ -14,62 +14,67 @@ import {
   Upload,
   UserCog,
   Webcam,
-} from "lucide-react"
-import { useTranslation } from "react-i18next"
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-import { ThemeToggle } from "@/components/theme/theme-toggle"
-import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useCurrentProject } from "@/features/app-state/app-settings-provider"
-import { LayoutPreviews } from "@/features/media-studio/layouts"
-import { ModalType } from "@/features/modals"
-import { useUserSettings } from "@/features/modals/features/user-settings/user-settings-provider"
-import { useModal } from "@/features/modals/services/modal-provider"
-import { cn } from "@/lib/utils"
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useCurrentProject } from "@/features/app-state/app-settings-provider";
+import { LayoutPreviews } from "@/features/media-studio/layouts";
+import { ModalType } from "@/features/modals";
+import { useUserSettings } from "@/features/modals/features/user-settings/user-settings-provider";
+import { useModal } from "@/features/modals/services/modal-provider";
+import { cn } from "@/lib/utils";
 
 export function TopBar() {
-  const { t } = useTranslation()
-  const { openModal } = useModal()
-  const { isBrowserVisible, toggleBrowserVisibility } = useUserSettings()
-  const { currentProject, openProject, saveProject, setProjectDirty } = useCurrentProject()
-  const [isEditing, setIsEditing] = useState(false)
-  const [projectName, setProjectName] = useState(currentProject.name)
+  const { t } = useTranslation();
+  const { openModal } = useModal();
+  const { isBrowserVisible, toggleBrowserVisibility } = useUserSettings();
+  const { currentProject, openProject, saveProject, setProjectDirty } =
+    useCurrentProject();
+  const [isEditing, setIsEditing] = useState(false);
+  const [projectName, setProjectName] = useState(currentProject.name);
 
   const handleOpenModal = (modal: string) => {
-    console.log(`Opening modal: ${modal}`)
-    openModal(modal as ModalType)
-  }
+    console.log(`Opening modal: ${modal}`);
+    openModal(modal as ModalType);
+  };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProjectName(e.target.value)
-    setProjectDirty(true)
-  }
+    setProjectName(e.target.value);
+    setProjectDirty(true);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      setIsEditing(false)
+      setIsEditing(false);
     }
-  }
+  };
 
   const handleSave = () => {
     try {
       // Сохраняем проект
-      void saveProject(projectName)
-      console.log("Project saved successfully")
+      void saveProject(projectName);
+      console.log("Project saved successfully");
     } catch (error) {
-      console.error("[handleSave] Error saving project:", error)
+      console.error("[handleSave] Error saving project:", error);
     }
-  }
+  };
 
   const handleOpenProject = () => {
     try {
       // Открываем проект
-      void openProject()
-      console.log("Project opened successfully")
+      void openProject();
+      console.log("Project opened successfully");
     } catch (error) {
-      console.error("[handleOpenProject] Error opening project:", error)
+      console.error("[handleOpenProject] Error opening project:", error);
     }
-  }
+  };
 
   return (
     <div className="relative flex w-full items-center bg-gray-200 px-1 py-0 dark:bg-[#343434]">
@@ -80,11 +85,17 @@ export function TopBar() {
           <Button
             variant="ghost"
             size="icon"
-            className={"transition-all duration-300 hover:bg-secondary h-7 w-7 cursor-pointer p-0"}
+            className={
+              "transition-all duration-300 hover:bg-secondary h-7 w-7 cursor-pointer p-0"
+            }
             onClick={toggleBrowserVisibility}
             title={isBrowserVisible ? t("browser.hide") : t("browser.show")}
           >
-            {isBrowserVisible ? <PanelLeftClose size={16} /> : <PanelLeftOpen size={16} />}
+            {isBrowserVisible ? (
+              <PanelLeftClose size={16} />
+            ) : (
+              <PanelLeftOpen size={16} />
+            )}
           </Button>
 
           <Popover>
@@ -158,11 +169,17 @@ export function TopBar() {
           <Button
             className={cn(
               "h-7 w-7 cursor-pointer p-0",
-              currentProject.isDirty ? "hover:bg-accent opacity-100" : "opacity-50 hover:opacity-50",
+              currentProject.isDirty
+                ? "hover:bg-accent opacity-100"
+                : "opacity-50 hover:opacity-50",
             )}
             variant="ghost"
             size="icon"
-            title={currentProject.isDirty ? t("topBar.saveChanges") : t("topBar.allChangesSaved")}
+            title={
+              currentProject.isDirty
+                ? t("topBar.saveChanges")
+                : t("topBar.allChangesSaved")
+            }
             onClick={handleSave}
             disabled={!currentProject.isDirty}
             data-testid="save-button"
@@ -174,7 +191,9 @@ export function TopBar() {
           <div
             className={cn(
               "group relative ml-1 w-[100px] text-xs",
-              isEditing ? "ring-1 ring-teal" : "transition-colors group-hover:ring-1 group-hover:ring-teal",
+              isEditing
+                ? "ring-1 ring-teal"
+                : "transition-colors group-hover:ring-1 group-hover:ring-teal",
             )}
             onClick={() => setIsEditing(true)}
           >
@@ -237,7 +256,9 @@ export function TopBar() {
             </PopoverTrigger>
             <PopoverContent className="w-64" sideOffset={0}>
               <div className="">
-                <h4 className="text-sm font-semibold">{t("topBar.publicationTasks")}</h4>
+                <h4 className="text-sm font-semibold">
+                  {t("topBar.publicationTasks")}
+                </h4>
                 <div className="h-10" />
               </div>
             </PopoverContent>
@@ -257,7 +278,9 @@ export function TopBar() {
             </PopoverTrigger>
             <PopoverContent className="w-64" sideOffset={0}>
               <div className="">
-                <h4 className="text-sm font-semibold">{t("topBar.projectTasks")}</h4>
+                <h4 className="text-sm font-semibold">
+                  {t("topBar.projectTasks")}
+                </h4>
                 <div className="h-10" />
               </div>
             </PopoverContent>
@@ -275,5 +298,5 @@ export function TopBar() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,22 +1,22 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react"
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
-import { convertFileSrc } from "@tauri-apps/api/core"
-import { readFile } from "@tauri-apps/plugin-fs"
-import { Music } from "lucide-react"
-import { LiveAudioVisualizer } from "react-audio-visualize"
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { readFile } from "@tauri-apps/plugin-fs";
+import { Music } from "lucide-react";
+import { LiveAudioVisualizer } from "react-audio-visualize";
 
-import { MediaFile } from "@/types/media"
+import { MediaFile } from "@/types/media";
 
-import { AddMediaButton } from "../layout/add-media-button"
-import { FavoriteButton } from "../layout/favorite-button"
+import { AddMediaButton } from "../layout/add-media-button";
+import { FavoriteButton } from "../layout/favorite-button";
 
 interface AudioPreviewProps {
-  file: MediaFile
-  onAddMedia?: (e: React.MouseEvent, file: MediaFile) => void
-  isAdded?: boolean
-  size?: number
-  showFileName?: boolean
-  dimensions?: [number, number]
+  file: MediaFile;
+  onAddMedia?: (e: React.MouseEvent, file: MediaFile) => void;
+  isAdded?: boolean;
+  size?: number;
+  showFileName?: boolean;
+  dimensions?: [number, number];
 }
 
 /**
@@ -45,133 +45,136 @@ export const AudioPreview = memo(function AudioPreview({
   showFileName = false,
   dimensions = [16, 9],
 }: AudioPreviewProps) {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [hoverTime, setHoverTime] = useState<number | null>(null)
-  const [isLoaded, setIsLoaded] = useState(false)
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const audioContextRef = useRef<AudioContext | null>(null)
-  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null)
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hoverTime, setHoverTime] = useState<number | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null,
+  );
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const rect = e.currentTarget.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const percentage = x / rect.width
-      const newTime = percentage * (file.duration ?? 0)
-      setHoverTime(newTime)
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = x / rect.width;
+      const newTime = percentage * (file.duration ?? 0);
+      setHoverTime(newTime);
 
       if (audioRef.current) {
-        audioRef.current.currentTime = newTime
+        audioRef.current.currentTime = newTime;
       }
     },
     [file.duration],
-  )
+  );
 
   const handlePlayPause = useCallback(
     (e: React.MouseEvent) => {
-      e.preventDefault()
-      if (!audioRef.current) return
+      e.preventDefault();
+      if (!audioRef.current) return;
 
       if (isPlaying) {
-        audioRef.current.pause()
+        audioRef.current.pause();
       } else {
         if (hoverTime !== null) {
-          audioRef.current.currentTime = hoverTime
+          audioRef.current.currentTime = hoverTime;
         }
-        void audioRef.current.play()
+        void audioRef.current.play();
       }
-      setIsPlaying(!isPlaying)
+      setIsPlaying(!isPlaying);
     },
     [isPlaying, hoverTime],
-  )
+  );
 
   const handleMouseLeave = useCallback(() => {
-    setHoverTime(null)
+    setHoverTime(null);
     if (audioRef.current && isPlaying) {
-      audioRef.current.pause()
-      setIsPlaying(false)
+      audioRef.current.pause();
+      setIsPlaying(false);
     }
-  }, [isPlaying])
+  }, [isPlaying]);
 
   // Состояние для хранения объекта URL
-  const [audioUrl, setAudioUrl] = useState<string>("")
+  const [audioUrl, setAudioUrl] = useState<string>("");
 
   // Функция для чтения файла и создания объекта URL
   const loadAudioFile = useCallback(async (path: string) => {
     try {
-      console.log("[AudioPreview] Чтение файла через readFile:", path)
-      const fileData = await readFile(path)
-      const blob = new Blob([fileData], { type: "audio/mp3" }) // Можно определить тип по расширению файла
-      const url = URL.createObjectURL(blob)
-      console.log("[AudioPreview] Создан объект URL:", url)
-      return url
+      console.log("[AudioPreview] Чтение файла через readFile:", path);
+      const fileData = await readFile(path);
+      const blob = new Blob([fileData], { type: "audio/mp3" }); // Можно определить тип по расширению файла
+      const url = URL.createObjectURL(blob);
+      console.log("[AudioPreview] Создан объект URL:", url);
+      return url;
     } catch (error) {
-      console.error("[AudioPreview] Ошибка при загрузке аудио:", error)
+      console.error("[AudioPreview] Ошибка при загрузке аудио:", error);
       // В случае ошибки используем convertFileSrc
-      const assetUrl = convertFileSrc(path)
-      console.log("[AudioPreview] Используем asset URL:", assetUrl)
-      return assetUrl
+      const assetUrl = convertFileSrc(path);
+      console.log("[AudioPreview] Используем asset URL:", assetUrl);
+      return assetUrl;
     }
-  }, [])
+  }, []);
 
   // Эффект для загрузки аудио при монтировании компонента
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     void loadAudioFile(file.path).then((url) => {
       if (isMounted) {
-        setAudioUrl(url)
+        setAudioUrl(url);
       }
-    })
+    });
 
     // Очистка объекта URL при размонтировании компонента
     return () => {
-      isMounted = false
+      isMounted = false;
       if (audioUrl?.startsWith("blob:")) {
-        URL.revokeObjectURL(audioUrl)
+        URL.revokeObjectURL(audioUrl);
       }
-    }
-  }, [file.path, loadAudioFile, audioUrl])
+    };
+  }, [file.path, loadAudioFile, audioUrl]);
 
   useEffect(() => {
-    const audioElement = audioRef.current
-    if (!audioElement) return
+    const audioElement = audioRef.current;
+    if (!audioElement) return;
 
     const initAudioContext = () => {
       try {
-        audioContextRef.current ??= new AudioContext()
+        audioContextRef.current ??= new AudioContext();
 
-        const audioContext = audioContextRef.current
+        const audioContext = audioContextRef.current;
 
-        sourceRef.current ??= audioContext.createMediaElementSource(audioElement)
+        sourceRef.current ??=
+          audioContext.createMediaElementSource(audioElement);
 
-        const destination = audioContext.createMediaStreamDestination()
-        sourceRef.current.connect(destination)
-        sourceRef.current.connect(audioContext.destination)
+        const destination = audioContext.createMediaStreamDestination();
+        sourceRef.current.connect(destination);
+        sourceRef.current.connect(audioContext.destination);
 
-        const recorder = new MediaRecorder(destination.stream)
-        setMediaRecorder(recorder)
-        recorder.start()
+        const recorder = new MediaRecorder(destination.stream);
+        setMediaRecorder(recorder);
+        recorder.start();
       } catch (error) {
-        console.error("Error initializing audio context:", error)
+        console.error("Error initializing audio context:", error);
       }
-    }
+    };
 
-    setTimeout(initAudioContext, 100)
+    setTimeout(initAudioContext, 100);
 
     return () => {
       if (mediaRecorder) {
-        mediaRecorder.stop()
+        mediaRecorder.stop();
       }
       if (sourceRef.current) {
-        sourceRef.current.disconnect()
+        sourceRef.current.disconnect();
       }
       if (audioContextRef.current) {
-        void audioContextRef.current.close()
+        void audioContextRef.current.close();
       }
-    }
-  }, [mediaRecorder])
+    };
+  }, [mediaRecorder]);
 
   return (
     <div
@@ -192,11 +195,13 @@ export const AudioPreview = memo(function AudioPreview({
         className="pointer-events-none absolute inset-0 h-full w-full focus:outline-none"
         onEnded={() => setIsPlaying(false)}
         onLoadedMetadata={() => setIsLoaded(true)}
-        onError={(e) => console.error("[AudioPreview] Ошибка загрузки аудио:", e)}
+        onError={(e) =>
+          console.error("[AudioPreview] Ошибка загрузки аудио:", e)
+        }
         onKeyDown={(e) => {
           if (e.code === "Space") {
-            e.preventDefault()
-            handlePlayPause(e as unknown as React.MouseEvent)
+            e.preventDefault();
+            handlePlayPause(e as unknown as React.MouseEvent);
           }
         }}
       />
@@ -226,7 +231,14 @@ export const AudioPreview = memo(function AudioPreview({
       <FavoriteButton file={file} size={size} type="audio" />
 
       {/* кнопка добавления */}
-      {onAddMedia && isLoaded && <AddMediaButton file={file} onAddMedia={onAddMedia} isAdded={isAdded} size={size} />}
+      {onAddMedia && isLoaded && (
+        <AddMediaButton
+          file={file}
+          onAddMedia={onAddMedia}
+          isAdded={isAdded}
+          size={size}
+        />
+      )}
 
       {/* Аудио визуализация */}
       <div
@@ -249,5 +261,5 @@ export const AudioPreview = memo(function AudioPreview({
         )}
       </div>
     </div>
-  )
-})
+  );
+});

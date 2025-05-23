@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react";
 
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next";
 
-import { usePlayer } from "@/features/video-player/components/player-provider"
-import { MediaFile } from "@/types/media"
+import { usePlayer } from "@/features/video-player/components/player-provider";
+import { MediaFile } from "@/types/media";
 
 interface VideoPanelProps {
-  video: MediaFile
-  isActive: boolean
-  videoRefs?: Record<string, HTMLVideoElement>
-  index?: number
-  hideLabel?: boolean
-  labelPosition?: "left" | "right" | "center"
+  video: MediaFile;
+  isActive: boolean;
+  videoRefs?: Record<string, HTMLVideoElement>;
+  index?: number;
+  hideLabel?: boolean;
+  labelPosition?: "left" | "right" | "center";
 }
 
 /**
@@ -26,59 +26,68 @@ export function VideoPanelComponent({
   hideLabel = false,
   labelPosition = "center",
 }: VideoPanelProps) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [isReady, setIsReady] = useState(false)
-  const { t } = useTranslation()
-  const { isPlaying } = usePlayer()
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isReady, setIsReady] = useState(false);
+  const { t } = useTranslation();
+  const { isPlaying } = usePlayer();
 
   // Эффект для регистрации видео в videoRefs и обновления src при изменении источника
   useEffect(() => {
     if (videoRef.current && video.id && videoRefs) {
-      console.log(`[VideoPanel] Регистрация видео ${video.id} startTime=${video.startTime}`)
+      console.log(
+        `[VideoPanel] Регистрация видео ${video.id} startTime=${video.startTime}`,
+      );
 
       // Сохраняем ссылку на видео элемент
-      videoRefs[video.id] = videoRef.current
+      videoRefs[video.id] = videoRef.current;
 
       // Проверяем, что src установлен правильно
-      if (video.path && (!videoRef.current.src?.includes(video.id))) {
-        console.log(`[VideoPanel] Принудительно обновляем src для видео ${video.id}: ${video.path}`)
+      if (video.path && !videoRef.current.src?.includes(video.id)) {
+        console.log(
+          `[VideoPanel] Принудительно обновляем src для видео ${video.id}: ${video.path}`,
+        );
 
         // Сохраняем текущее время и состояние воспроизведения
-        const currentTime = videoRef.current.currentTime
-        const wasPlaying = !videoRef.current.paused
+        const currentTime = videoRef.current.currentTime;
+        const wasPlaying = !videoRef.current.paused;
 
         // Обновляем src с небольшой задержкой для предотвращения черного экрана
         setTimeout(() => {
           if (videoRef.current) {
             // Обновляем src
-            videoRef.current.src = video.path
-            videoRef.current.load()
+            videoRef.current.src = video.path;
+            videoRef.current.load();
 
             // Восстанавливаем время и состояние воспроизведения
             if (currentTime > 0) {
-              videoRef.current.currentTime = currentTime
+              videoRef.current.currentTime = currentTime;
             }
 
             if (wasPlaying) {
               videoRef.current
                 .play()
-                .catch((e: unknown) => console.error(`[VideoPanel] Ошибка воспроизведения видео ${video.id}:`, e))
+                .catch((e: unknown) =>
+                  console.error(
+                    `[VideoPanel] Ошибка воспроизведения видео ${video.id}:`,
+                    e,
+                  ),
+                );
             }
           }
-        }, 100)
+        }, 100);
       }
 
       return () => {
         // Не удаляем ссылку на видео элемент при размонтировании компонента
         // Это позволяет избежать черного экрана при переключении между видео
         // delete videoRefs[video.id]
-      }
+      };
     }
-  }, [video, videoRefs])
+  }, [video, videoRefs]);
 
-  const videoKey = video.path ? video.path : `empty-${video.id}`
+  const videoKey = video.path ? video.path : `empty-${video.id}`;
 
-  console.log(`[VideoPanel] Рендеринг видео с ключом: ${videoKey}`)
+  console.log(`[VideoPanel] Рендеринг видео с ключом: ${videoKey}`);
 
   return (
     <div
@@ -122,7 +131,9 @@ export function VideoPanelComponent({
           <div className="absolute inset-0 flex items-center justify-center bg-black text-white">
             <div className="text-center">
               <div className="mb-2 text-3xl">📹</div>
-              <div className="text-sm">{t("timeline.player.noVideoSelected")}</div>
+              <div className="text-sm">
+                {t("timeline.player.noVideoSelected")}
+              </div>
             </div>
           </div>
         )}
@@ -139,12 +150,17 @@ export function VideoPanelComponent({
         {/* Надпись с названием камеры - всегда рендерим, но скрываем через opacity */}
         <div
           className={`absolute bottom-2 ${
-            labelPosition === "left" ? "left-2" : labelPosition === "right" ? "right-2" : "left-1/2 -translate-x-1/2"
+            labelPosition === "left"
+              ? "left-2"
+              : labelPosition === "right"
+                ? "right-2"
+                : "left-1/2 -translate-x-1/2"
           } bg-opacity-50 rounded bg-black px-2 py-1 text-xs text-white`}
           style={{
             opacity: !hideLabel && video.name && video.path ? 1 : 0,
             transition: "opacity 0.2s ease-in-out", // Плавное появление/исчезновение
-            pointerEvents: !hideLabel && video.name && video.path ? "auto" : "none", // Отключаем события мыши, когда скрыто
+            pointerEvents:
+              !hideLabel && video.name && video.path ? "auto" : "none", // Отключаем события мыши, когда скрыто
           }}
         >
           {video.name || ""}
@@ -163,5 +179,5 @@ export function VideoPanelComponent({
         </div>
       </div>
     </div>
-  )
+  );
 }

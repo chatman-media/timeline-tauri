@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import {
   Camera,
@@ -16,33 +16,33 @@ import {
   UnfoldHorizontal,
   Volume2,
   VolumeX,
-} from "lucide-react"
-import { useTranslation } from "react-i18next"
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-import { Button } from "@/components/ui/button"
-import { Slider } from "@/components/ui/slider"
-import { cn } from "@/lib/utils"
-import { getFrameTime } from "@/lib/video"
-import { MediaFile } from "@/types/media"
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
+import { getFrameTime } from "@/lib/video";
+import { MediaFile } from "@/types/media";
 
-import { usePlayer } from "./player-provider"
-import { VolumeSlider } from "./volume-slider"
-import { useFullscreen } from "../hooks/use-fullscreen"
+import { usePlayer } from "./player-provider";
+import { VolumeSlider } from "./volume-slider";
+import { useFullscreen } from "../hooks/use-fullscreen";
 
 interface PlayerControlsProps {
   /**
    * Текущее время воспроизведения в секундах
    */
-  currentTime: number
+  currentTime: number;
 
   /**
    * Медиафайл для воспроизведения (опционально)
    */
-  file: MediaFile
+  file: MediaFile;
 }
 
 export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const {
     isPlaying,
     setIsPlaying,
@@ -55,130 +55,150 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
     isChangingCamera,
     isResizableMode,
     setIsResizableMode,
-  } = usePlayer()
+  } = usePlayer();
 
   // Используем состояние для хранения текущего времени воспроизведения
-  const [localDisplayTime, setLocalDisplayTime] = useState(0)
+  const [localDisplayTime, setLocalDisplayTime] = useState(0);
 
   // Используем хук для отслеживания полноэкранного режима
-  const { isFullscreen } = useFullscreen()
+  const { isFullscreen } = useFullscreen();
 
   // Создаем ref для хранения текущего значения громкости
-  const volumeRef = useRef<number>(volume)
+  const volumeRef = useRef<number>(volume);
 
   // Функция для переключения полноэкранного режима
   const handleFullscreen = useCallback(() => {
     // Находим контейнер медиаплеера
-    const playerContainer = document.querySelector(".media-player-container")
+    const playerContainer = document.querySelector(".media-player-container");
 
     if (!playerContainer) {
-      console.error("[handleFullscreen] Не найден контейнер медиаплеера")
-      return
+      console.error("[handleFullscreen] Не найден контейнер медиаплеера");
+      return;
     }
 
     // Используем функцию toggleFullscreen из хука useFullscreenChange
-    const { toggleFullscreen } = useFullscreen()
-    toggleFullscreen(playerContainer as HTMLElement)
+    const { toggleFullscreen } = useFullscreen();
+    toggleFullscreen(playerContainer as HTMLElement);
 
-    console.log(`[handleFullscreen] ${isFullscreen ? "Выход из" : "Вход в"} полноэкранный режим`)
-  }, [isFullscreen])
+    console.log(
+      `[handleFullscreen] ${isFullscreen ? "Выход из" : "Вход в"} полноэкранный режим`,
+    );
+  }, [isFullscreen]);
 
   // Нормализуем currentTime для отображения, если это Unix timestamp
   const calculatedDisplayTime = useMemo(() => {
     if (currentTime > 365 * 24 * 60 * 60) {
       // Если время больше года в секундах, это, вероятно, Unix timestamp
       // Используем локальное время для отображения
-      return localDisplayTime
+      return localDisplayTime;
     }
-    return currentTime
-  }, [currentTime, localDisplayTime])
+    return currentTime;
+  }, [currentTime, localDisplayTime]);
 
   // Получаем frameTime с помощью функции getFrameTime
-  const frameTime = getFrameTime(file)
+  const frameTime = getFrameTime(file);
 
   // Определяем isFirstFrame и isLastFrame на основе мемоизированных значений
   const isFirstFrame = useMemo(() => {
-    return Math.abs(currentTime - (file.startTime ?? 0)) < frameTime
-  }, [currentTime, file.startTime, frameTime])
+    return Math.abs(currentTime - (file.startTime ?? 0)) < frameTime;
+  }, [currentTime, file.startTime, frameTime]);
 
   const isLastFrame = useMemo(() => {
-    return Math.abs(currentTime - (file.endTime ?? 0)) < frameTime
-  }, [currentTime, file.endTime, frameTime])
+    return Math.abs(currentTime - (file.endTime ?? 0)) < frameTime;
+  }, [currentTime, file.endTime, frameTime]);
 
   const handleTimeChange = useCallback(
     (value: number[]) => {
-      const newTime = value[0]
-      setLocalDisplayTime(newTime)
-      setCurrentTime(newTime)
-      setIsSeeking(true)
+      const newTime = value[0];
+      setLocalDisplayTime(newTime);
+      setCurrentTime(newTime);
+      setIsSeeking(true);
     },
     [setLocalDisplayTime, setCurrentTime, setIsSeeking],
-  )
+  );
 
   const handleRecordToggle = useCallback(() => {
-    setIsRecording(!isRecording)
-  }, [isRecording, setIsRecording])
+    setIsRecording(!isRecording);
+  }, [isRecording, setIsRecording]);
 
   const handlePlayPause = useCallback(() => {
-    setIsPlaying(!isPlaying)
-  }, [isPlaying, setIsPlaying])
+    setIsPlaying(!isPlaying);
+  }, [isPlaying, setIsPlaying]);
 
   const handleSkipForward = useCallback(() => {
-    const newTime = Math.min(currentTime + frameTime, file.endTime ?? file.duration ?? 0)
-    setLocalDisplayTime(newTime)
-    setCurrentTime(newTime)
-    setIsSeeking(true)
-  }, [currentTime, frameTime, file.endTime, file.duration, setLocalDisplayTime, setCurrentTime, setIsSeeking])
+    const newTime = Math.min(
+      currentTime + frameTime,
+      file.endTime ?? file.duration ?? 0,
+    );
+    setLocalDisplayTime(newTime);
+    setCurrentTime(newTime);
+    setIsSeeking(true);
+  }, [
+    currentTime,
+    frameTime,
+    file.endTime,
+    file.duration,
+    setLocalDisplayTime,
+    setCurrentTime,
+    setIsSeeking,
+  ]);
 
   const handleSkipBackward = useCallback(() => {
-    const newTime = Math.max(currentTime - frameTime, file.startTime ?? 0)
-    setLocalDisplayTime(newTime)
-    setCurrentTime(newTime)
-    setIsSeeking(true)
-  }, [currentTime, frameTime, file.startTime, setLocalDisplayTime, setCurrentTime, setIsSeeking])
+    const newTime = Math.max(currentTime - frameTime, file.startTime ?? 0);
+    setLocalDisplayTime(newTime);
+    setCurrentTime(newTime);
+    setIsSeeking(true);
+  }, [
+    currentTime,
+    frameTime,
+    file.startTime,
+    setLocalDisplayTime,
+    setCurrentTime,
+    setIsSeeking,
+  ]);
 
   const handleChevronFirst = useCallback(() => {
-    const newTime = file.startTime ?? 0
-    setLocalDisplayTime(newTime)
-    setCurrentTime(newTime)
-    setIsSeeking(true)
-  }, [file.startTime, setLocalDisplayTime, setCurrentTime, setIsSeeking])
+    const newTime = file.startTime ?? 0;
+    setLocalDisplayTime(newTime);
+    setCurrentTime(newTime);
+    setIsSeeking(true);
+  }, [file.startTime, setLocalDisplayTime, setCurrentTime, setIsSeeking]);
 
   const handleChevronLast = useCallback(() => {
-    const newTime = file.endTime ?? 0
-    setLocalDisplayTime(newTime)
-    setCurrentTime(newTime)
-    setIsSeeking(true)
-  }, [file.endTime, setLocalDisplayTime, setCurrentTime, setIsSeeking])
+    const newTime = file.endTime ?? 0;
+    setLocalDisplayTime(newTime);
+    setCurrentTime(newTime);
+    setIsSeeking(true);
+  }, [file.endTime, setLocalDisplayTime, setCurrentTime, setIsSeeking]);
 
   // Функция для переключения звука (вкл/выкл)
   const handleToggleMute = useCallback(() => {
     // Если звук выключен, устанавливаем последнее сохраненное значение или 100%
     if (volume === 0) {
-      const newVolume = volumeRef.current > 0 ? volumeRef.current : 100
-      setVolume(newVolume)
-      console.log("[handleToggleMute] Unmute, volume:", newVolume)
+      const newVolume = volumeRef.current > 0 ? volumeRef.current : 100;
+      setVolume(newVolume);
+      console.log("[handleToggleMute] Unmute, volume:", newVolume);
     } else {
       // Сохраняем текущее значение громкости перед выключением
-      volumeRef.current = volume
-      setVolume(0)
-      console.log("[handleToggleMute] Mute, saved volume:", volumeRef.current)
+      volumeRef.current = volume;
+      setVolume(0);
+      console.log("[handleToggleMute] Mute, saved volume:", volumeRef.current);
     }
-  }, [volume, setVolume])
+  }, [volume, setVolume]);
 
   // Функция для изменения громкости
   const handleVolumeChange = useCallback(
     (value: number[]) => {
-      const newVolume = value[0] // Значение уже в диапазоне 0-100
-      setVolume(newVolume)
+      const newVolume = value[0]; // Значение уже в диапазоне 0-100
+      setVolume(newVolume);
     },
     [setVolume],
-  )
+  );
 
   // Функция, вызываемая при завершении изменения громкости
   const handleVolumeChangeEnd = useCallback(() => {
-    console.log("[handleVolumeChangeEnd] Volume change completed:", volume)
-  }, [volume])
+    console.log("[handleVolumeChangeEnd] Volume change completed:", volume);
+  }, [volume]);
 
   return (
     <div className="flex w-full flex-col">
@@ -238,7 +258,8 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
               size="icon"
               title={
                 typeof window !== "undefined"
-                  ? t("timeline.controlsMain.resetTemplate") || "Сбросить шаблон"
+                  ? t("timeline.controlsMain.resetTemplate") ||
+                    "Сбросить шаблон"
                   : "Reset Template"
               }
               // onClick={handleResetTemplate}
@@ -269,7 +290,11 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
               className="h-8 w-8 cursor-pointer"
               variant="ghost"
               size="icon"
-              title={typeof window !== "undefined" ? t("timeline.controls.takeSnapshot") : "Take snapshot"}
+              title={
+                typeof window !== "undefined"
+                  ? t("timeline.controls.takeSnapshot")
+                  : "Take snapshot"
+              }
               // onClick={takeSnapshot}
             >
               <Camera className="h-8 w-8" />
@@ -285,7 +310,11 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
               className="h-8 w-8 cursor-pointer"
               variant="ghost"
               size="icon"
-              title={typeof window !== "undefined" ? t("timeline.controls.firstFrame") : "First frame"}
+              title={
+                typeof window !== "undefined"
+                  ? t("timeline.controls.firstFrame")
+                  : "First frame"
+              }
               onClick={handleChevronFirst}
               disabled={isFirstFrame || isPlaying || isChangingCamera}
             >
@@ -296,7 +325,11 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
               className="h-8 w-8 cursor-pointer"
               variant="ghost"
               size="icon"
-              title={typeof window !== "undefined" ? t("timeline.controls.previousFrame") : "Previous frame"}
+              title={
+                typeof window !== "undefined"
+                  ? t("timeline.controls.previousFrame")
+                  : "Previous frame"
+              }
               onClick={handleSkipBackward}
               disabled={isFirstFrame || isPlaying || isChangingCamera}
             >
@@ -317,7 +350,11 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
               onClick={handlePlayPause}
               disabled={isChangingCamera}
             >
-              {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
+              {isPlaying ? (
+                <Pause className="h-8 w-8" />
+              ) : (
+                <Play className="h-8 w-8" />
+              )}
             </Button>
 
             <Button
@@ -337,7 +374,9 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
               <CircleDot
                 className={cn(
                   "h-8 w-8",
-                  isRecording ? "animate-pulse text-red-500 hover:text-red-600" : "text-white hover:text-gray-300",
+                  isRecording
+                    ? "animate-pulse text-red-500 hover:text-red-600"
+                    : "text-white hover:text-gray-300",
                 )}
               />
             </Button>
@@ -346,7 +385,11 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
               className="h-8 w-8 cursor-pointer"
               variant="ghost"
               size="icon"
-              title={typeof window !== "undefined" ? t("timeline.controls.nextFrame") : "Next frame"}
+              title={
+                typeof window !== "undefined"
+                  ? t("timeline.controls.nextFrame")
+                  : "Next frame"
+              }
               onClick={handleSkipForward}
               disabled={isLastFrame || isPlaying || isChangingCamera}
             >
@@ -357,7 +400,11 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
               className="h-8 w-8 cursor-pointer"
               variant="ghost"
               size="icon"
-              title={typeof window !== "undefined" ? t("timeline.controls.lastFrame") : "Last frame"}
+              title={
+                typeof window !== "undefined"
+                  ? t("timeline.controls.lastFrame")
+                  : "Last frame"
+              }
               onClick={handleChevronLast}
               disabled={isLastFrame || isPlaying || isChangingCamera}
             >
@@ -366,7 +413,10 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
           </div>
 
           {/* Правая часть: кнопки управления звуком и полноэкранным режимом */}
-          <div className="flex items-center gap-2" style={{ justifyContent: "flex-end" }}>
+          <div
+            className="flex items-center gap-2"
+            style={{ justifyContent: "flex-end" }}
+          >
             <div className="flex items-center gap-2">
               <Button
                 className="h-8 w-8 cursor-pointer"
@@ -381,7 +431,11 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
                 }
                 onClick={handleToggleMute}
               >
-                {volume === 0 ? <VolumeX className="h-8 w-8" /> : <Volume2 className="h-8 w-8" />}
+                {volume === 0 ? (
+                  <VolumeX className="h-8 w-8" />
+                ) : (
+                  <Volume2 className="h-8 w-8" />
+                )}
               </Button>
               <div className="w-20">
                 <VolumeSlider
@@ -407,11 +461,15 @@ export function PlayerControls({ currentTime, file }: PlayerControlsProps) {
               onClick={handleFullscreen}
               disabled={!file}
             >
-              {isFullscreen ? <Minimize2 className="h-8 w-8" /> : <Maximize2 className="h-8 w-8" />}
+              {isFullscreen ? (
+                <Minimize2 className="h-8 w-8" />
+              ) : (
+                <Maximize2 className="h-8 w-8" />
+              )}
             </Button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

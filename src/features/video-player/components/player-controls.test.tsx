@@ -1,17 +1,17 @@
-import { fireEvent, render, screen } from "@testing-library/react"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { MediaFile } from "@/types/media"
+import { MediaFile } from "@/types/media";
 
-import { PlayerControls } from "./player-controls"
+import { PlayerControls } from "./player-controls";
 
 // Мокаем usePlayer из player-provider
-const mockSetIsPlaying = vi.fn()
-const mockSetCurrentTime = vi.fn()
-const mockSetVolume = vi.fn()
-const mockSetIsRecording = vi.fn()
-const mockSetIsSeeking = vi.fn()
-const mockSetIsResizableMode = vi.fn()
+const mockSetIsPlaying = vi.fn();
+const mockSetCurrentTime = vi.fn();
+const mockSetVolume = vi.fn();
+const mockSetIsRecording = vi.fn();
+const mockSetIsSeeking = vi.fn();
+const mockSetIsResizableMode = vi.fn();
 
 vi.mock("./player-provider", () => ({
   usePlayer: () => ({
@@ -27,16 +27,16 @@ vi.mock("./player-provider", () => ({
     isResizableMode: true,
     setIsResizableMode: mockSetIsResizableMode,
   }),
-}))
+}));
 
 // Мокаем useFullscreen из use-fullscreen
-const mockToggleFullscreen = vi.fn()
+const mockToggleFullscreen = vi.fn();
 vi.mock("../hooks/use-fullscreen", () => ({
   useFullscreen: () => ({
     isFullscreen: false,
     toggleFullscreen: mockToggleFullscreen,
   }),
-}))
+}));
 
 // Мокаем VolumeSlider из volume-slider
 vi.mock("./volume-slider", () => ({
@@ -53,19 +53,19 @@ vi.mock("./volume-slider", () => ({
       </button>
     </div>
   ),
-}))
+}));
 
 // Мокаем getFrameTime из @/lib/video
 vi.mock("@/lib/video", () => ({
   getFrameTime: vi.fn().mockReturnValue(0.04), // 25 fps
-}))
+}));
 
 // Мокаем react-i18next
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
-}))
+}));
 
 // Мокаем компоненты из lucide-react
 vi.mock("lucide-react", () => ({
@@ -84,7 +84,7 @@ vi.mock("lucide-react", () => ({
   UnfoldHorizontal: () => <div data-testid="unfold-horizontal-icon" />,
   Volume2: () => <div data-testid="volume-icon" />,
   VolumeX: () => <div data-testid="volume-x-icon" />,
-}))
+}));
 
 // Мокаем компоненты из @/components/ui
 vi.mock("@/components/ui/button", () => ({
@@ -93,10 +93,18 @@ vi.mock("@/components/ui/button", () => ({
       {children}
     </button>
   ),
-}))
+}));
 
 vi.mock("@/components/ui/slider", () => ({
-  Slider: ({ value, min, max, step, onValueChange, disabled, className }: any) => (
+  Slider: ({
+    value,
+    min,
+    max,
+    step,
+    onValueChange,
+    disabled,
+    className,
+  }: any) => (
     <input
       type="range"
       value={value[0]}
@@ -109,14 +117,14 @@ vi.mock("@/components/ui/slider", () => ({
       data-testid="timeline-slider"
     />
   ),
-}))
+}));
 
 // Мокаем console.log для проверки вызова
 beforeEach(() => {
-  vi.clearAllMocks()
-  vi.spyOn(console, "log").mockImplementation(() => {})
-  vi.spyOn(console, "error").mockImplementation(() => {})
-})
+  vi.clearAllMocks();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  vi.spyOn(console, "error").mockImplementation(() => {});
+});
 
 // Создаем тестовый объект MediaFile
 const testVideo: MediaFile = {
@@ -126,171 +134,187 @@ const testVideo: MediaFile = {
   duration: 120,
   startTime: 0,
   endTime: 120,
-}
+};
 
 describe("PlayerControls", () => {
   it("should render all controls", () => {
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Проверяем, что все основные элементы управления отрендерились
-    expect(screen.getByTestId("play-icon")).toBeInTheDocument()
-    expect(screen.getByTestId("timeline-slider")).toBeInTheDocument()
-    expect(screen.getByTestId("volume-slider")).toBeInTheDocument()
-  })
+    expect(screen.getByTestId("play-icon")).toBeInTheDocument();
+    expect(screen.getByTestId("timeline-slider")).toBeInTheDocument();
+    expect(screen.getByTestId("volume-slider")).toBeInTheDocument();
+  });
 
   it("should toggle play/pause when play button is clicked", () => {
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Находим кнопку воспроизведения
-    const playButton = screen.getByTestId("play-icon").closest("button")
-    
+    const playButton = screen.getByTestId("play-icon").closest("button");
+
     // Кликаем по кнопке
     if (playButton) {
-      fireEvent.click(playButton)
+      fireEvent.click(playButton);
     }
 
     // Проверяем, что setIsPlaying был вызван с правильным значением
-    expect(mockSetIsPlaying).toHaveBeenCalledWith(true)
-  })
+    expect(mockSetIsPlaying).toHaveBeenCalledWith(true);
+  });
 
   it("should toggle recording when record button is clicked", () => {
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Находим кнопку записи
-    const recordButton = screen.getByTestId("circle-dot-icon").closest("button")
-    
+    const recordButton = screen
+      .getByTestId("circle-dot-icon")
+      .closest("button");
+
     // Кликаем по кнопке
     if (recordButton) {
-      fireEvent.click(recordButton)
+      fireEvent.click(recordButton);
     }
 
     // Проверяем, что setIsRecording был вызван с правильным значением
-    expect(mockSetIsRecording).toHaveBeenCalledWith(true)
-  })
+    expect(mockSetIsRecording).toHaveBeenCalledWith(true);
+  });
 
   it("should skip forward when next frame button is clicked", () => {
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Находим кнопку следующего кадра
-    const nextFrameButton = screen.getByTestId("step-forward-icon").closest("button")
-    
+    const nextFrameButton = screen
+      .getByTestId("step-forward-icon")
+      .closest("button");
+
     // Кликаем по кнопке
     if (nextFrameButton) {
-      fireEvent.click(nextFrameButton)
+      fireEvent.click(nextFrameButton);
     }
 
     // Проверяем, что setCurrentTime был вызван с правильным значением (текущее время + frameTime)
-    expect(mockSetCurrentTime).toHaveBeenCalledWith(10.04)
-    expect(mockSetIsSeeking).toHaveBeenCalledWith(true)
-  })
+    expect(mockSetCurrentTime).toHaveBeenCalledWith(10.04);
+    expect(mockSetIsSeeking).toHaveBeenCalledWith(true);
+  });
 
   it("should skip backward when previous frame button is clicked", () => {
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Находим кнопку предыдущего кадра
-    const prevFrameButton = screen.getByTestId("step-back-icon").closest("button")
-    
+    const prevFrameButton = screen
+      .getByTestId("step-back-icon")
+      .closest("button");
+
     // Кликаем по кнопке
     if (prevFrameButton) {
-      fireEvent.click(prevFrameButton)
+      fireEvent.click(prevFrameButton);
     }
 
     // Проверяем, что setCurrentTime был вызван с правильным значением (текущее время - frameTime)
-    expect(mockSetCurrentTime).toHaveBeenCalledWith(9.96)
-    expect(mockSetIsSeeking).toHaveBeenCalledWith(true)
-  })
+    expect(mockSetCurrentTime).toHaveBeenCalledWith(9.96);
+    expect(mockSetIsSeeking).toHaveBeenCalledWith(true);
+  });
 
   it("should go to first frame when first frame button is clicked", () => {
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Находим кнопку первого кадра
-    const firstFrameButton = screen.getByTestId("chevron-first-icon").closest("button")
-    
+    const firstFrameButton = screen
+      .getByTestId("chevron-first-icon")
+      .closest("button");
+
     // Кликаем по кнопке
     if (firstFrameButton) {
-      fireEvent.click(firstFrameButton)
+      fireEvent.click(firstFrameButton);
     }
 
     // Проверяем, что setCurrentTime был вызван с правильным значением (startTime)
-    expect(mockSetCurrentTime).toHaveBeenCalledWith(0)
-    expect(mockSetIsSeeking).toHaveBeenCalledWith(true)
-  })
+    expect(mockSetCurrentTime).toHaveBeenCalledWith(0);
+    expect(mockSetIsSeeking).toHaveBeenCalledWith(true);
+  });
 
   it("should go to last frame when last frame button is clicked", () => {
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Находим кнопку последнего кадра
-    const lastFrameButton = screen.getByTestId("chevron-last-icon").closest("button")
-    
+    const lastFrameButton = screen
+      .getByTestId("chevron-last-icon")
+      .closest("button");
+
     // Кликаем по кнопке
     if (lastFrameButton) {
-      fireEvent.click(lastFrameButton)
+      fireEvent.click(lastFrameButton);
     }
 
     // Проверяем, что setCurrentTime был вызван с правильным значением (endTime)
-    expect(mockSetCurrentTime).toHaveBeenCalledWith(120)
-    expect(mockSetIsSeeking).toHaveBeenCalledWith(true)
-  })
+    expect(mockSetCurrentTime).toHaveBeenCalledWith(120);
+    expect(mockSetIsSeeking).toHaveBeenCalledWith(true);
+  });
 
   it("should toggle resizable mode when resizable button is clicked", () => {
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Находим кнопку переключения режима resizable
-    const resizableButton = screen.getByTestId("unfold-horizontal-icon").closest("button")
-    
+    const resizableButton = screen
+      .getByTestId("unfold-horizontal-icon")
+      .closest("button");
+
     // Кликаем по кнопке
     if (resizableButton) {
-      fireEvent.click(resizableButton)
+      fireEvent.click(resizableButton);
     }
 
     // Проверяем, что setIsResizableMode был вызван с правильным значением
-    expect(mockSetIsResizableMode).toHaveBeenCalledWith(false)
-  })
+    expect(mockSetIsResizableMode).toHaveBeenCalledWith(false);
+  });
 
   it("should change volume when volume slider is used", () => {
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Находим кнопку изменения громкости в слайдере
-    const volumeChangeButton = screen.getByTestId("volume-slider-change")
-    
+    const volumeChangeButton = screen.getByTestId("volume-slider-change");
+
     // Кликаем по кнопке
-    fireEvent.click(volumeChangeButton)
+    fireEvent.click(volumeChangeButton);
 
     // Проверяем, что setVolume был вызван с правильным значением
-    expect(mockSetVolume).toHaveBeenCalledWith(75)
-  })
+    expect(mockSetVolume).toHaveBeenCalledWith(75);
+  });
 
   it("should toggle fullscreen when fullscreen button is clicked", () => {
     // Создаем мок для querySelector
-    const mockQuerySelector = vi.spyOn(document, "querySelector").mockReturnValue(document.createElement("div"))
+    const mockQuerySelector = vi
+      .spyOn(document, "querySelector")
+      .mockReturnValue(document.createElement("div"));
 
     // Рендерим компонент
-    render(<PlayerControls currentTime={10} file={testVideo} />)
+    render(<PlayerControls currentTime={10} file={testVideo} />);
 
     // Находим кнопку полноэкранного режима
-    const fullscreenButton = screen.getByTestId("maximize-icon").closest("button")
-    
+    const fullscreenButton = screen
+      .getByTestId("maximize-icon")
+      .closest("button");
+
     // Кликаем по кнопке
     if (fullscreenButton) {
-      fireEvent.click(fullscreenButton)
+      fireEvent.click(fullscreenButton);
     }
 
     // Проверяем, что querySelector был вызван с правильным селектором
-    expect(mockQuerySelector).toHaveBeenCalledWith(".media-player-container")
-    
+    expect(mockQuerySelector).toHaveBeenCalledWith(".media-player-container");
+
     // Проверяем, что toggleFullscreen был вызван
-    expect(mockToggleFullscreen).toHaveBeenCalled()
+    expect(mockToggleFullscreen).toHaveBeenCalled();
 
     // Восстанавливаем оригинальную функцию querySelector
-    mockQuerySelector.mockRestore()
-  })
-})
+    mockQuerySelector.mockRestore();
+  });
+});

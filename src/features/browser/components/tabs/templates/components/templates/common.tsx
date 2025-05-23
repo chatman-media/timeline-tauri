@@ -1,18 +1,18 @@
-import React from "react"
+import React from "react";
 
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next";
 
-import { MediaFile } from "@/types/media"
+import { MediaFile } from "@/types/media";
 
-import { VideoPanelComponent } from "../video-panel-component"
+import { VideoPanelComponent } from "../video-panel-component";
 
 interface VideoPanelProps {
-  video: MediaFile
-  isActive: boolean
-  videoRefs?: Record<string, HTMLVideoElement>
-  index?: number // Индекс видео в шаблоне
-  hideLabel?: boolean // Флаг для скрытия надписи с названием камеры
-  labelPosition?: "left" | "right" | "center" // Позиция надписи с названием камеры
+  video: MediaFile;
+  isActive: boolean;
+  videoRefs?: Record<string, HTMLVideoElement>;
+  index?: number; // Индекс видео в шаблоне
+  hideLabel?: boolean; // Флаг для скрытия надписи с названием камеры
+  labelPosition?: "left" | "right" | "center"; // Позиция надписи с названием камеры
 }
 
 /**
@@ -27,20 +27,22 @@ export function VideoPanel({
   hideLabel = false,
   labelPosition = "center",
 }: VideoPanelProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   // Если видео не существует или не имеет пути, показываем сообщение об ошибке
   // Для пустых видео с id, начинающимся с "empty-", показываем пустой черный экран
   if (!video?.path) {
     if (video?.id?.startsWith("empty-")) {
-      return <div className="relative h-full w-full bg-black" />
+      return <div className="relative h-full w-full bg-black" />;
     }
 
     return (
       <div className="relative flex h-full w-full items-center justify-center bg-black">
-        <span className="text-white">{t("timeline.player.videoUnavailable", "Видео недоступно")}</span>
+        <span className="text-white">
+          {t("timeline.player.videoUnavailable", "Видео недоступно")}
+        </span>
       </div>
-    )
+    );
   }
 
   return (
@@ -52,5 +54,5 @@ export function VideoPanel({
       hideLabel={hideLabel}
       labelPosition={labelPosition}
     />
-  )
+  );
 }

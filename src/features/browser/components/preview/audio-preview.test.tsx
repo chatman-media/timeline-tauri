@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react"
-import { describe, expect, it, vi } from "vitest"
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
-import { MediaFile } from "@/types/media"
+import { MediaFile } from "@/types/media";
 
-import { AudioPreview } from "./audio-preview"
+import { AudioPreview } from "./audio-preview";
 
 // Мокаем компоненты, которые используются в AudioPreview
 vi.mock("./preview-timeline", () => ({
@@ -17,7 +17,7 @@ vi.mock("./preview-timeline", () => ({
       Timeline
     </div>
   ),
-}))
+}));
 
 vi.mock("../layout/add-media-button", () => ({
   AddMediaButton: ({ file, onAddMedia, isAdded, size }: any) => (
@@ -31,15 +31,20 @@ vi.mock("../layout/add-media-button", () => ({
       Add Media
     </button>
   ),
-}))
+}));
 
 vi.mock("../layout/favorite-button", () => ({
   FavoriteButton: ({ file, size, type }: any) => (
-    <button data-testid="favorite-button" data-file={file.name} data-size={size} data-type={type}>
+    <button
+      data-testid="favorite-button"
+      data-file={file.name}
+      data-size={size}
+      data-type={type}
+    >
       Favorite
     </button>
   ),
-}))
+}));
 
 vi.mock("lucide-react", () => ({
   Music: ({ size }: any) => (
@@ -47,10 +52,18 @@ vi.mock("lucide-react", () => ({
       Music Icon
     </div>
   ),
-}))
+}));
 
 vi.mock("react-audio-visualize", () => ({
-  LiveAudioVisualizer: ({ mediaRecorder, width, height, barWidth, gap, barColor, backgroundColor }: any) => (
+  LiveAudioVisualizer: ({
+    mediaRecorder,
+    width,
+    height,
+    barWidth,
+    gap,
+    barColor,
+    backgroundColor,
+  }: any) => (
     <div
       data-testid="audio-visualizer"
       data-width={width}
@@ -63,7 +76,7 @@ vi.mock("react-audio-visualize", () => ({
       Audio Visualizer
     </div>
   ),
-}))
+}));
 
 // Мокаем глобальные объекты
 global.AudioContext = vi.fn().mockImplementation(() => ({
@@ -76,12 +89,12 @@ global.AudioContext = vi.fn().mockImplementation(() => ({
   }),
   destination: {},
   close: vi.fn(),
-}))
+}));
 
 global.MediaRecorder = vi.fn().mockImplementation(() => ({
   start: vi.fn(),
   stop: vi.fn(),
-}))
+}));
 
 describe("AudioPreview", () => {
   const audioFile: MediaFile = {
@@ -92,51 +105,51 @@ describe("AudioPreview", () => {
     isAudio: true,
     isImage: false,
     duration: 180, // 3 минуты
-  }
+  };
 
   it("should render correctly with default props", () => {
-    render(<AudioPreview file={audioFile} />)
+    render(<AudioPreview file={audioFile} />);
 
     // Проверяем, что аудио элемент отображается
-    const audioElement = document.querySelector("audio")
-    expect(audioElement).not.toBeNull()
-    expect(audioElement).toHaveAttribute("src", "converted-/path/to/audio.mp3")
+    const audioElement = document.querySelector("audio");
+    expect(audioElement).not.toBeNull();
+    expect(audioElement).toHaveAttribute("src", "converted-/path/to/audio.mp3");
 
     // Проверяем, что иконка музыки отображается
-    const musicIcon = screen.getByTestId("music-icon")
-    expect(musicIcon).toBeInTheDocument()
-    expect(musicIcon).toHaveAttribute("data-size", "12") // Маленький размер по умолчанию
+    const musicIcon = screen.getByTestId("music-icon");
+    expect(musicIcon).toBeInTheDocument();
+    expect(musicIcon).toHaveAttribute("data-size", "12"); // Маленький размер по умолчанию
 
     // Проверяем, что кнопка избранного отображается
-    const favoriteButton = screen.getByTestId("favorite-button")
-    expect(favoriteButton).toBeInTheDocument()
-    expect(favoriteButton).toHaveAttribute("data-file", "audio.mp3")
-    expect(favoriteButton).toHaveAttribute("data-size", "60")
-    expect(favoriteButton).toHaveAttribute("data-type", "audio")
+    const favoriteButton = screen.getByTestId("favorite-button");
+    expect(favoriteButton).toBeInTheDocument();
+    expect(favoriteButton).toHaveAttribute("data-file", "audio.mp3");
+    expect(favoriteButton).toHaveAttribute("data-size", "60");
+    expect(favoriteButton).toHaveAttribute("data-type", "audio");
 
     // Проверяем, что имя файла не отображается
-    expect(screen.queryByText("audio.mp3")).not.toBeInTheDocument()
+    expect(screen.queryByText("audio.mp3")).not.toBeInTheDocument();
 
     // Проверяем, что timeline не отображается
-    expect(screen.queryByTestId("preview-timeline")).not.toBeInTheDocument()
-  })
+    expect(screen.queryByTestId("preview-timeline")).not.toBeInTheDocument();
+  });
 
   it("should show filename when showFileName is true", () => {
-    render(<AudioPreview file={audioFile} showFileName={true} />)
+    render(<AudioPreview file={audioFile} showFileName={true} />);
 
     // Проверяем, что имя файла отображается
-    expect(screen.getByText("audio.mp3")).toBeInTheDocument()
-  })
+    expect(screen.getByText("audio.mp3")).toBeInTheDocument();
+  });
 
   it("should render with custom size and dimensions", () => {
-    render(<AudioPreview file={audioFile} size={120} dimensions={[4, 3]} />)
+    render(<AudioPreview file={audioFile} size={120} dimensions={[4, 3]} />);
 
     // Проверяем, что иконка музыки имеет больший размер
-    const musicIcon = screen.getByTestId("music-icon")
-    expect(musicIcon).toHaveAttribute("data-size", "16") // Большой размер для size > 100
+    const musicIcon = screen.getByTestId("music-icon");
+    expect(musicIcon).toHaveAttribute("data-size", "16"); // Большой размер для size > 100
 
     // Проверяем, что кнопка избранного имеет правильный размер
-    const favoriteButton = screen.getByTestId("favorite-button")
-    expect(favoriteButton).toHaveAttribute("data-size", "120")
-  })
-})
+    const favoriteButton = screen.getByTestId("favorite-button");
+    expect(favoriteButton).toHaveAttribute("data-size", "120");
+  });
+});

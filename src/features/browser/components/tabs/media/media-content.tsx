@@ -1,32 +1,32 @@
-import React from "react"
+import React from "react";
 
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next";
 
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { MediaFile } from "@/types/media"
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MediaFile } from "@/types/media";
 
-import { MediaGroup } from "./media-group"
-import { NoFiles } from "../../layout/no-files"
+import { MediaGroup } from "./media-group";
+import { NoFiles } from "../../layout/no-files";
 
 /**
  * Интерфейс свойств компонента MediaContent
  */
 interface MediaContentProps {
   /** Сгруппированные файлы */
-  groupedFiles: { title: string; files: MediaFile[] }[]
+  groupedFiles: { title: string; files: MediaFile[] }[];
   /** Режим отображения */
-  viewMode: "list" | "grid" | "thumbnails"
+  viewMode: "list" | "grid" | "thumbnails";
   /** Размер превью */
-  previewSize: number
+  previewSize: number;
   /** Флаг загрузки */
-  isLoading: boolean
+  isLoading: boolean;
   /** Сообщение об ошибке */
-  error: string | null
+  error: string | null;
   /** Функция для добавления файлов на таймлайн */
-  addFilesToTimeline: (files: MediaFile[]) => void
+  addFilesToTimeline: (files: MediaFile[]) => void;
   /** Функция для повторной загрузки при ошибке */
-  onRetry: () => void
+  onRetry: () => void;
 }
 
 /**
@@ -44,7 +44,7 @@ export const MediaContent: React.FC<MediaContentProps> = ({
   addFilesToTimeline,
   onRetry,
 }) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   // Если идет загрузка, показываем скелетон
   if (isLoading) {
@@ -74,7 +74,7 @@ export const MediaContent: React.FC<MediaContentProps> = ({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   // Если есть ошибка, показываем сообщение об ошибке
@@ -83,18 +83,20 @@ export const MediaContent: React.FC<MediaContentProps> = ({
       <div className="flex h-full w-full flex-col items-center justify-center">
         <div className="text-center">
           <h3 className="mb-2 text-lg font-medium">{t("common.error")}</h3>
-          <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">{error}</p>
+          <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+            {error}
+          </p>
           <Button className="rounded-md px-4 py-2 text-white" onClick={onRetry}>
             {t("common.retry")}
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   // Если нет файлов, показываем сообщение об отсутствии файлов
   if (groupedFiles.length === 0 || groupedFiles[0].files.length === 0) {
-    return <NoFiles />
+    return <NoFiles />;
   }
 
   // Отображаем группы файлов
@@ -111,5 +113,5 @@ export const MediaContent: React.FC<MediaContentProps> = ({
         />
       ))}
     </div>
-  )
-}
+  );
+};

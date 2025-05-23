@@ -1,12 +1,12 @@
-import React from "react"
+import React from "react";
 
-import { convertFileSrc } from "@tauri-apps/api/core"
+import { convertFileSrc } from "@tauri-apps/api/core";
 
-import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { useProjectSettings } from "@/features/modals/features/project-settings/project-settings-provider"
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useProjectSettings } from "@/features/modals/features/project-settings/project-settings-provider";
 
-import { PlayerControls } from "./player-controls"
-import { usePlayer } from "./player-provider"
+import { PlayerControls } from "./player-controls";
+import { usePlayer } from "./player-provider";
 
 /**
  * Компонент медиа-плеера для воспроизведения видео
@@ -14,11 +14,11 @@ import { usePlayer } from "./player-provider"
 export function VideoPlayer() {
   const {
     settings: { aspectRatio },
-  } = useProjectSettings()
-  const { video } = usePlayer()
+  } = useProjectSettings();
+  const { video } = usePlayer();
 
   // Вычисляем соотношение сторон для AspectRatio
-  const aspectRatioValue = aspectRatio.value.width / aspectRatio.value.height
+  const aspectRatioValue = aspectRatio.value.width / aspectRatio.value.height;
 
   // Вычисляем стили для контейнера видео
   const containerStyle = {
@@ -29,10 +29,10 @@ export function VideoPlayer() {
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
-  }
+  };
 
   if (!video?.path) {
-    return null
+    return null;
   }
 
   return (
@@ -70,7 +70,7 @@ export function VideoPlayer() {
       </div>
       <PlayerControls currentTime={0} file={video} />
     </div>
-  )
+  );
 }
 
-VideoPlayer.displayName = "VideoPlayer"
+VideoPlayer.displayName = "VideoPlayer";

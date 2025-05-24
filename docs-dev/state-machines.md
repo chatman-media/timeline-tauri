@@ -34,32 +34,32 @@ Timeline Editor использует библиотеку XState для упра
 ```typescript
 interface AppSettingsContext {
   userSettings: {
-    previewSizes: Record<"MEDIA" | "TRANSITIONS" | "TEMPLATES", number>
-    activeTab: BrowserTab
-    layoutMode: LayoutMode
-    screenshotsPath: string
-    playerScreenshotsPath: string
-    playerVolume: number
-    openAiApiKey: string
-    claudeApiKey: string
-    isBrowserVisible: boolean
-    isLoaded: boolean
-  }
-  recentProjects: RecentProject[]
+    previewSizes: Record<"MEDIA" | "TRANSITIONS" | "TEMPLATES", number>;
+    activeTab: BrowserTab;
+    layoutMode: LayoutMode;
+    screenshotsPath: string;
+    playerScreenshotsPath: string;
+    playerVolume: number;
+    openAiApiKey: string;
+    claudeApiKey: string;
+    isBrowserVisible: boolean;
+    isLoaded: boolean;
+  };
+  recentProjects: RecentProject[];
   currentProject: {
-    path: string | null
-    name: string
-    isDirty: boolean
-    isNew: boolean
-  }
+    path: string | null;
+    name: string;
+    isDirty: boolean;
+    isNew: boolean;
+  };
   mediaFiles: {
-    allMediaFiles: MediaFile[]
-    error: string | null
-    isLoading: boolean
-  }
-  favorites: FavoritesType
-  isLoading: boolean
-  error: string | null
+    allMediaFiles: MediaFile[];
+    error: string | null;
+    isLoading: boolean;
+  };
+  favorites: FavoritesType;
+  isLoading: boolean;
+  error: string | null;
 }
 ```
 
@@ -99,17 +99,17 @@ interface AppSettingsContext {
 
 ```typescript
 interface ChatMachineContext {
-  chatMessages: ChatMessage[]
-  selectedAgentId: string | null
-  isProcessing: boolean
-  error: string | null
+  chatMessages: ChatMessage[];
+  selectedAgentId: string | null;
+  isProcessing: boolean;
+  error: string | null;
 }
 
 interface ChatMessage {
-  id: string
-  text: string
-  sender: "user" | "assistant"
-  timestamp: string
+  id: string;
+  text: string;
+  sender: "user" | "assistant";
+  timestamp: string;
 }
 ```
 
@@ -146,25 +146,25 @@ interface ChatMessage {
 
 ```typescript
 interface PlayerContext {
-  video: MediaFile | null
-  currentTime: number
-  duration: number
-  volume: number
-  isPlaying: boolean
-  isSeeking: boolean
-  isChangingCamera: boolean
-  isRecording: boolean
-  videoRefs: Record<string, HTMLVideoElement>
-  videos: Record<string, TimelineVideo>
-  error: string | null
+  video: MediaFile | null;
+  currentTime: number;
+  duration: number;
+  volume: number;
+  isPlaying: boolean;
+  isSeeking: boolean;
+  isChangingCamera: boolean;
+  isRecording: boolean;
+  videoRefs: Record<string, HTMLVideoElement>;
+  videos: Record<string, TimelineVideo>;
+  error: string | null;
 }
 
 interface TimelineVideo {
-  id: string
-  src: string
-  startTime: number
-  endTime: number
-  volume: number
+  id: string;
+  src: string;
+  startTime: number;
+  endTime: number;
+  volume: number;
 }
 ```
 
@@ -213,24 +213,24 @@ interface TimelineVideo {
 
 ```typescript
 interface ResourcesContext {
-  effects: Effect[]
-  filters: Filter[]
-  transitions: Transition[]
-  templates: Template[]
-  music: MusicFile[]
-  subtitles: SubtitleFile[]
-  selectedResource: Resource | null
-  isLoading: boolean
-  error: string | null
+  effects: Effect[];
+  filters: Filter[];
+  transitions: Transition[];
+  templates: Template[];
+  music: MusicFile[];
+  subtitles: SubtitleFile[];
+  selectedResource: Resource | null;
+  isLoading: boolean;
+  error: string | null;
 }
 
 interface Resource {
-  id: string
-  name: string
-  type: "effect" | "filter" | "transition" | "template" | "music" | "subtitle"
-  thumbnail?: string
-  duration?: number
-  path: string
+  id: string;
+  name: string;
+  type: "effect" | "filter" | "transition" | "template" | "music" | "subtitle";
+  thumbnail?: string;
+  duration?: number;
+  path: string;
 }
 ```
 
@@ -269,12 +269,12 @@ interface Resource {
 
 ```typescript
 interface ModalContext {
-  isOpen: boolean
-  content: ReactNode | null
-  title: string
-  size: "sm" | "md" | "lg" | "xl" | "full"
-  onClose?: () => void
-  data?: any
+  isOpen: boolean;
+  content: ReactNode | null;
+  title: string;
+  size: "sm" | "md" | "lg" | "xl" | "full";
+  onClose?: () => void;
+  data?: any;
 }
 ```
 
@@ -304,23 +304,23 @@ interface ModalContext {
 
 ```typescript
 interface MusicContext {
-  musicFiles: MusicFile[]
-  filteredMusicFiles: MusicFile[]
-  selectedMusicFile: MusicFile | null
-  searchQuery: string
-  isLoading: boolean
-  error: string | null
+  musicFiles: MusicFile[];
+  filteredMusicFiles: MusicFile[];
+  selectedMusicFile: MusicFile | null;
+  searchQuery: string;
+  isLoading: boolean;
+  error: string | null;
 }
 
 interface MusicFile {
-  id: string
-  name: string
-  path: string
-  duration: number
-  artist?: string
-  album?: string
-  genre?: string
-  thumbnail?: string
+  id: string;
+  name: string;
+  path: string;
+  duration: number;
+  artist?: string;
+  album?: string;
+  genre?: string;
+  thumbnail?: string;
 }
 ```
 
@@ -354,16 +354,16 @@ interface MusicFile {
 
 ```typescript
 interface UserSettingsContext {
-  previewSizes: Record<"MEDIA" | "TRANSITIONS" | "TEMPLATES", number>
-  activeTab: BrowserTab
-  layoutMode: LayoutMode
-  screenshotsPath: string
-  playerScreenshotsPath: string
-  playerVolume: number
-  openAiApiKey: string
-  claudeApiKey: string
-  isBrowserVisible: boolean
-  isLoaded: boolean
+  previewSizes: Record<"MEDIA" | "TRANSITIONS" | "TEMPLATES", number>;
+  activeTab: BrowserTab;
+  layoutMode: LayoutMode;
+  screenshotsPath: string;
+  playerScreenshotsPath: string;
+  playerVolume: number;
+  openAiApiKey: string;
+  claudeApiKey: string;
+  isBrowserVisible: boolean;
+  isLoaded: boolean;
 }
 ```
 
@@ -401,13 +401,13 @@ interface UserSettingsContext {
 
 ```typescript
 interface ProjectSettingsContext {
-  settings: ProjectSettings
+  settings: ProjectSettings;
 }
 
 interface ProjectSettings {
-  resolution: Resolution
-  frameRate: number
-  exportSettings: ExportSettings
+  resolution: Resolution;
+  frameRate: number;
+  exportSettings: ExportSettings;
   // другие настройки проекта
 }
 ```
@@ -434,19 +434,19 @@ interface ProjectSettings {
 
 ```typescript
 interface MediaContext {
-  allMediaFiles: MediaFile[]
-  error: string | null
-  isLoading: boolean
-  favorites: FavoritesType
+  allMediaFiles: MediaFile[];
+  error: string | null;
+  isLoading: boolean;
+  favorites: FavoritesType;
 }
 
 interface MediaFile {
-  id: string
-  name: string
-  path: string
-  type: "video" | "audio" | "image"
-  duration?: number
-  thumbnail?: string
+  id: string;
+  name: string;
+  path: string;
+  type: "video" | "audio" | "image";
+  duration?: number;
+  thumbnail?: string;
 }
 ```
 
@@ -504,14 +504,17 @@ interface MediaFile {
 ### Примеры взаимодействия:
 
 1. **Централизованное управление настройками**:
+
    - `appSettingsMachine` управляет всеми настройками приложения
    - Другие машины получают доступ к настройкам через контекст
 
 2. **AI чат и модальные окна**:
+
    - `chatMachine` может открывать модальные окна через `modalMachine`
    - Для отображения настроек агентов или ошибок
 
 3. **Плеер и ресурсы**:
+
    - `playerMachine` воспроизводит видео с примененными ресурсами
    - `resourcesMachine` предоставляет эффекты и фильтры для применения
 
@@ -565,15 +568,15 @@ interface MediaFile {
 
 ```typescript
 // Примеры использования хуков
-import { useAppSettings } from "@/features/app-state/app-settings-provider"
-import { useChat } from "@/features/chat/services/chat-provider"
-import { useModal } from "@/features/modals/services/modal-provider"
-import { useUserSettings } from "@/features/modals/features/user-settings/user-settings-provider"
-import { useProjectSettings } from "@/features/modals/features/project-settings/project-settings-provider"
-import { usePlayer } from "@/features/video-player/providers/player-provider"
-import { useResources } from "@/features/browser/resources/resources-provider"
-import { useMusic } from "@/features/browser/components/tabs/music/music-provider"
-import { useMedia } from "@/features/browser/media/media-provider"
+import { useAppSettings } from "@/features/app-state/app-settings-provider";
+import { useChat } from "@/features/chat/services/chat-provider";
+import { useModal } from "@/features/modals/services/modal-provider";
+import { useUserSettings } from "@/features/modals/features/user-settings/user-settings-provider";
+import { useProjectSettings } from "@/features/modals/features/project-settings/project-settings-provider";
+import { usePlayer } from "@/features/video-player/providers/player-provider";
+import { useResources } from "@/features/browser/resources/resources-provider";
+import { useMusic } from "@/features/browser/components/tabs/music/music-provider";
+import { useMedia } from "@/features/browser/media/media-provider";
 ```
 
 ### Композиция провайдеров
@@ -582,19 +585,19 @@ import { useMedia } from "@/features/browser/media/media-provider"
 
 ```typescript
 export const AppProvider = composeProviders(
-  I18nProvider,              // Интернационализация
-  ModalProvider,             // Модальные окна
-  AppSettingsProvider,       // Централизованные настройки приложения
-  ProjectSettingsProvider,   // Настройки проекта
-  UserSettingsProvider,      // Пользовательские настройки
-  ResourcesProvider,         // Ресурсы таймлайна
-  MusicProvider,             // Музыкальные файлы
-  MediaProvider,             // Медиафайлы
-  PreviewSizeProvider,       // Размеры превью
-  TemplateListProvider,      // Шаблоны
-  PlayerProvider,            // Видеоплеер
-  ChatProvider,              // AI чат
-)
+  I18nProvider, // Интернационализация
+  ModalProvider, // Модальные окна
+  AppSettingsProvider, // Централизованные настройки приложения
+  ProjectSettingsProvider, // Настройки проекта
+  UserSettingsProvider, // Пользовательские настройки
+  ResourcesProvider, // Ресурсы таймлайна
+  MusicProvider, // Музыкальные файлы
+  MediaProvider, // Медиафайлы
+  PreviewSizeProvider, // Размеры превью
+  TemplateListProvider, // Шаблоны
+  PlayerProvider, // Видеоплеер
+  ChatProvider, // AI чат
+);
 ```
 
 ### Особенности архитектуры

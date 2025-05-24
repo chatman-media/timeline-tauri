@@ -1,17 +1,17 @@
-import { memo, useEffect, useRef, useState } from "react"
+import { memo, useEffect, useRef, useState } from "react";
 
-import { Check, Plus, X } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import { Check, Plus, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-import { cn } from "@/lib/utils"
-import { MediaFile } from "@/types/media"
+import { cn } from "@/lib/utils";
+import { MediaFile } from "@/types/media";
 
 interface AddMediaButtonProps {
-  file: MediaFile
-  isAdded?: boolean
-  size?: number
-  onAddMedia?: (e: React.MouseEvent, file: MediaFile) => void
-  onRemoveMedia?: (e: React.MouseEvent, file: MediaFile) => void
+  file: MediaFile;
+  isAdded?: boolean;
+  size?: number;
+  onAddMedia?: (e: React.MouseEvent, file: MediaFile) => void;
+  onRemoveMedia?: (e: React.MouseEvent, file: MediaFile) => void;
 }
 
 /**
@@ -38,63 +38,63 @@ export const AddMediaButton = memo(function AddMediaButton({
   onAddMedia,
   onRemoveMedia,
 }: AddMediaButtonProps) {
-  const { t } = useTranslation()
-  const [isHovering, setIsHovering] = useState(false)
-  const [isRecentlyAdded, setIsRecentlyAdded] = useState(false)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
-  const prevIsAddedRef = useRef(isAdded)
+  const { t } = useTranslation();
+  const [isHovering, setIsHovering] = useState(false);
+  const [isRecentlyAdded, setIsRecentlyAdded] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const prevIsAddedRef = useRef(isAdded);
 
   // Обновляем состояние при изменении isAdded
   useEffect(() => {
     if (isAdded !== prevIsAddedRef.current) {
       // Если файл добавлен, устанавливаем флаг isRecentlyAdded
       if (isAdded) {
-        setIsRecentlyAdded(true)
+        setIsRecentlyAdded(true);
 
         // Очищаем предыдущий таймер, если он есть
         if (timerRef.current) {
-          clearTimeout(timerRef.current)
+          clearTimeout(timerRef.current);
         }
 
         // Через 1.5 секунды сбрасываем флаг
         timerRef.current = setTimeout(() => {
-          setIsRecentlyAdded(false)
-          timerRef.current = null
-        }, 1500)
+          setIsRecentlyAdded(false);
+          timerRef.current = null;
+        }, 1500);
       } else {
         // Если файл удален, сбрасываем флаг isRecentlyAdded
-        setIsRecentlyAdded(false)
+        setIsRecentlyAdded(false);
 
         // Очищаем таймер
         if (timerRef.current) {
-          clearTimeout(timerRef.current)
-          timerRef.current = null
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
         }
       }
 
       // Обновляем предыдущее значение isAdded
-      prevIsAddedRef.current = isAdded
+      prevIsAddedRef.current = isAdded;
     }
 
     // Очищаем таймер при размонтировании компонента
     return () => {
       if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
-    }
-  }, [isAdded])
+    };
+  }, [isAdded]);
 
-  if (!onAddMedia) return null
+  if (!onAddMedia) return null;
 
   // Если функция удаления не передана, используем функцию добавления
-  const handleRemove = onRemoveMedia ?? onAddMedia
+  const handleRemove = onRemoveMedia ?? onAddMedia;
 
-  const iconSize = size > 100 ? "h-3.5 w-3.5" : "h-2.5 w-2.5"
+  const iconSize = size > 100 ? "h-3.5 w-3.5" : "h-2.5 w-2.5";
 
   // Определяем, можно ли показывать кнопку удаления
   // Не показываем кнопку удаления в течение 1.5 секунд после добавления
-  const canShowRemoveButton = !isRecentlyAdded
+  const canShowRemoveButton = !isRecentlyAdded;
 
   return (
     <button
@@ -110,15 +110,15 @@ export const AddMediaButton = memo(function AddMediaButton({
       )}
       style={{ color: "#ffffff" }}
       onClick={(e) => {
-        e.stopPropagation()
+        e.stopPropagation();
         // Предотвращаем двойные клики
-        e.preventDefault()
+        e.preventDefault();
 
         if (isAdded && isHovering && canShowRemoveButton) {
-          handleRemove(e, file)
+          handleRemove(e, file);
         } else if (!isAdded) {
-          onAddMedia(e, file)
-          setIsRecentlyAdded(true)
+          onAddMedia(e, file);
+          setIsRecentlyAdded(true);
         }
       }}
       onMouseEnter={() => setIsHovering(true)}
@@ -135,15 +135,19 @@ export const AddMediaButton = memo(function AddMediaButton({
         isHovering && canShowRemoveButton ? (
           <X className={`${iconSize} text-black/50`} strokeWidth={3} />
         ) : (
-          <Check className={iconSize} strokeWidth={2} style={{ color: "#ffffff" }} />
+          <Check
+            className={iconSize}
+            strokeWidth={2}
+            style={{ color: "#ffffff" }}
+          />
         )
       ) : (
-        <Plus 
+        <Plus
           className={`${iconSize} transition-transform duration-150 hover:scale-110`}
           strokeWidth={2}
           style={{ color: "#ffffff" }}
         />
       )}
     </button>
-  )
-})
+  );
+});

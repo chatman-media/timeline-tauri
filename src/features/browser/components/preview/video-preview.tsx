@@ -258,255 +258,257 @@ export const VideoPreview = memo(function VideoPreview({
         </div>
       ) : (
         videoData.videoStreams.map((stream: FfprobeStream) => {
-        const key = stream.streamKey ?? `stream-${stream.index}`;
-        const isMultipleStreams = videoData.isMultipleStreams;
+          const key = stream.streamKey ?? `stream-${stream.index}`;
+          const isMultipleStreams = videoData.isMultipleStreams;
 
-        // Используем размеры из метаданных или значения по умолчанию для 16:9
-        const videoWidth = stream.width || 1920;
-        const videoHeight = stream.height || 1080;
+          // Используем размеры из метаданных или значения по умолчанию для 16:9
+          const videoWidth = stream.width || 1920;
+          const videoHeight = stream.height || 1080;
 
-        const width = calculateWidth(
-          videoWidth,
-          videoHeight,
-          size,
-          parseRotation(stream.rotation),
-        );
+          const width = calculateWidth(
+            videoWidth,
+            videoHeight,
+            size,
+            parseRotation(stream.rotation),
+          );
 
-        const adptivedWidth = calculateAdaptiveWidth(
-          width,
-          isMultipleStreams,
-          stream.display_aspect_ratio || "16:9",
-        );
+          const adptivedWidth = calculateAdaptiveWidth(
+            width,
+            isMultipleStreams,
+            stream.display_aspect_ratio || "16:9",
+          );
 
-        // Используем соотношение сторон из метаданных или 16:9 по умолчанию
-        const aspectRatio = stream.display_aspect_ratio
-          ?.split(":")
-          .map(Number) ?? [16, 9];
-        const ratio = aspectRatio[0] / aspectRatio[1];
+          // Используем соотношение сторон из метаданных или 16:9 по умолчанию
+          const aspectRatio = stream.display_aspect_ratio
+            ?.split(":")
+            .map(Number) ?? [16, 9];
+          const ratio = aspectRatio[0] / aspectRatio[1];
 
-        return (
-          <div
-            key={key}
-            className="relative flex-shrink-0"
-            style={{
-              height: `${size}px`,
-              width:
-                ratio > 1
-                  ? ignoreRatio
-                    ? width
-                    : adptivedWidth
-                  : isMultipleStreams && ignoreRatio
-                    ? width
-                    : adptivedWidth,
-            }}
-            onClick={(e) => handlePlayPause(e, stream)}
-          >
+          return (
             <div
-              className="group relative h-full w-full"
-              onMouseMove={(e) => handleMouseMove(e, stream)}
-              onMouseLeave={handleMouseLeave}
+              key={key}
+              className="relative flex-shrink-0"
+              style={{
+                height: `${size}px`,
+                width:
+                  ratio > 1
+                    ? ignoreRatio
+                      ? width
+                      : adptivedWidth
+                    : isMultipleStreams && ignoreRatio
+                      ? width
+                      : adptivedWidth,
+              }}
+              onClick={(e) => handlePlayPause(e, stream)}
             >
-              <video
-                ref={(el) => {
-                  videoRefs.current[key] = el;
-                }}
-                src={videoUrl || convertFileSrc(file.path)}
-                preload="auto"
-                tabIndex={0}
-                playsInline
-                muted={false} // Включаем звук в превью по запросу пользователя
-                className={cn(
-                  "absolute inset-0 h-full w-full focus:outline-none",
-                  isAdded ? "opacity-50" : "",
-                )}
-                style={{
-                  transition: "opacity 0.2s ease-in-out",
-                }}
-                onEnded={() => {
-                  console.log("Video ended for stream:", stream.index);
-                  setIsPlaying(false);
-                }}
-                onPlay={(e) => {
-                  console.log("Video playing for stream:", stream.index);
-                  const video = e.currentTarget;
-                  const currentTime = hoverTime;
-                  if (currentTime !== null) {
-                    video.currentTime = currentTime;
-                  }
-                }}
-                onTimeUpdate={(e) => {
-                  // Обновляем только каждые 500 мс вместо случайного выбора
-                  const now = Date.now();
-                  if (now - lastUpdateTimeRef.current > 500) {
-                    lastUpdateTimeRef.current = now;
+              <div
+                className="group relative h-full w-full"
+                onMouseMove={(e) => handleMouseMove(e, stream)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <video
+                  ref={(el) => {
+                    videoRefs.current[key] = el;
+                  }}
+                  src={videoUrl || convertFileSrc(file.path)}
+                  preload="auto"
+                  tabIndex={0}
+                  playsInline
+                  muted={false} // Включаем звук в превью по запросу пользователя
+                  className={cn(
+                    "absolute inset-0 h-full w-full focus:outline-none",
+                    isAdded ? "opacity-50" : "",
+                  )}
+                  style={{
+                    transition: "opacity 0.2s ease-in-out",
+                  }}
+                  onEnded={() => {
+                    console.log("Video ended for stream:", stream.index);
+                    setIsPlaying(false);
+                  }}
+                  onPlay={(e) => {
+                    console.log("Video playing for stream:", stream.index);
+                    const video = e.currentTarget;
+                    const currentTime = hoverTime;
+                    if (currentTime !== null) {
+                      video.currentTime = currentTime;
+                    }
+                  }}
+                  onTimeUpdate={(e) => {
+                    // Обновляем только каждые 500 мс вместо случайного выбора
+                    const now = Date.now();
+                    if (now - lastUpdateTimeRef.current > 500) {
+                      lastUpdateTimeRef.current = now;
+                      console.log(
+                        "Time update for stream:",
+                        typeof stream.index !== "undefined"
+                          ? stream.index
+                          : key,
+                        "current time:",
+                        e.currentTarget.currentTime.toFixed(2),
+                      );
+                    }
+                  }}
+                  onError={(e) => {
                     console.log(
-                      "Time update for stream:",
+                      "Video error for stream:",
                       typeof stream.index !== "undefined" ? stream.index : key,
-                      "current time:",
-                      e.currentTarget.currentTime.toFixed(2),
+                      e,
                     );
-                  }
-                }}
-                onError={(e) => {
-                  console.log(
-                    "Video error for stream:",
-                    typeof stream.index !== "undefined" ? stream.index : key,
-                    e,
-                  );
 
-                  // Получаем элемент видео
-                  const video = e.currentTarget as HTMLVideoElement;
+                    // Получаем элемент видео
+                    const video = e.currentTarget as HTMLVideoElement;
 
-                  // Проверяем, какая ошибка произошла
-                  if (video.error) {
-                    console.error(
-                      "[VideoPreview] Ошибка загрузки видео:",
-                      video.error.code,
-                      video.error.message,
-                      "для файла:",
-                      file.name,
-                      "URL:",
-                      video.src,
-                    );
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.code === "Space") {
-                    e.preventDefault();
-                    handlePlayPause(e as unknown as React.MouseEvent, stream);
-                  }
-                }}
-                onLoadedData={() => {
-                  console.log(
-                    "Video loaded for stream:",
-                    typeof stream.index !== "undefined" ? stream.index : key,
-                  );
-                  setIsLoaded(true);
-
-                  // Проверяем, есть ли у файла probeData и streams
-                  if (
-                    !file.probeData?.streams ||
-                    file.probeData.streams.length === 0
-                  ) {
+                    // Проверяем, какая ошибка произошла
+                    if (video.error) {
+                      console.error(
+                        "[VideoPreview] Ошибка загрузки видео:",
+                        video.error.code,
+                        video.error.message,
+                        "для файла:",
+                        file.name,
+                        "URL:",
+                        video.src,
+                      );
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.code === "Space") {
+                      e.preventDefault();
+                      handlePlayPause(e as unknown as React.MouseEvent, stream);
+                    }
+                  }}
+                  onLoadedData={() => {
                     console.log(
-                      "No streams found in probeData for file:",
-                      file.name,
+                      "Video loaded for stream:",
+                      typeof stream.index !== "undefined" ? stream.index : key,
                     );
-                  }
-                }}
-              />
+                    setIsLoaded(true);
 
-              {/* Продолжительность видео */}
-              {!(
-                isMultipleStreams &&
-                typeof stream.index !== "undefined" &&
-                stream.index === 0
-              ) && (
-                <div
-                  className={cn(
-                    "pointer-events-none absolute rounded-xs bg-black/60 text-xs leading-[16px]",
-                    size > 100
-                      ? "top-1 right-1 px-[4px] py-[2px]"
-                      : "top-0.5 right-0.5 px-0.5 py-0",
-                  )}
-                  style={{
-                    fontSize: size > 100 ? "13px" : "11px",
-                    color: "#ffffff", // Явно задаем чисто белый цвет для Tauri
+                    // Проверяем, есть ли у файла probeData и streams
+                    if (
+                      !file.probeData?.streams ||
+                      file.probeData.streams.length === 0
+                    ) {
+                      console.log(
+                        "No streams found in probeData for file:",
+                        file.name,
+                      );
+                    }
                   }}
-                >
-                  {formatDuration(file.duration ?? 0, 0, true)}
-                </div>
-              )}
+                />
 
-              {/* Иконка видео */}
-              {!(
-                isMultipleStreams &&
-                typeof stream.index !== "undefined" &&
-                stream.index !== 0
-              ) && (
-                <div
-                  className={cn(
-                    "pointer-events-none absolute rounded-xs bg-black/60 p-0.5",
-                    size > 100 ? "bottom-1 left-1" : "bottom-0.5 left-0.5",
-                  )}
-                  style={{
-                    color: "#ffffff", // Явно задаем чисто белый цвет для Tauri
-                  }}
-                >
-                  <Film size={size > 100 ? 16 : 12} />
-                </div>
-              )}
-
-              {/* Кнопка избранного */}
-              {!(
-                isMultipleStreams &&
-                typeof stream.index !== "undefined" &&
-                stream.index !== 0
-              ) && <FavoriteButton file={file} size={size} type="media" />}
-
-              {/* Разрешение видео */}
-              {isLoaded &&
-                !(
+                {/* Продолжительность видео */}
+                {!(
                   isMultipleStreams &&
                   typeof stream.index !== "undefined" &&
-                  stream.index !== 0
+                  stream.index === 0
                 ) && (
                   <div
-                    className={`pointer-events-none absolute ${
-                      size > 100 ? "left-[28px]" : "left-[22px]"
-                    } rounded-xs bg-black/60 text-xs leading-[16px] ${size > 100 ? "bottom-1" : "bottom-0.5"} ${
-                      size > 100 ? "px-[4px] py-[2px]" : "px-[2px] py-0"
-                    }`}
+                    className={cn(
+                      "pointer-events-none absolute rounded-xs bg-black/60 text-xs leading-[16px]",
+                      size > 100
+                        ? "top-1 right-1 px-[4px] py-[2px]"
+                        : "top-0.5 right-0.5 px-0.5 py-0",
+                    )}
                     style={{
                       fontSize: size > 100 ? "13px" : "11px",
                       color: "#ffffff", // Явно задаем чисто белый цвет для Tauri
                     }}
                   >
-                    {formatResolution(stream.width ?? 0, stream.height ?? 0)}
+                    {formatDuration(file.duration ?? 0, 0, true)}
                   </div>
                 )}
 
-              {/* Имя файла */}
-              {showFileName &&
-                !(
+                {/* Иконка видео */}
+                {!(
                   isMultipleStreams &&
                   typeof stream.index !== "undefined" &&
                   stream.index !== 0
                 ) && (
                   <div
-                    className={`absolute font-medium ${size > 100 ? "top-1" : "top-0.5"} ${
-                      size > 100 ? "left-1" : "left-0.5"
-                    } ${
-                      size > 100 ? "px-[4px] py-[2px]" : "px-[2px] py-0"
-                    } line-clamp-1 rounded-xs bg-black/60 text-xs leading-[16px] ${isMultipleStreams ? "max-w-[100%]" : "max-w-[60%]"}`}
+                    className={cn(
+                      "pointer-events-none absolute rounded-xs bg-black/60 p-0.5",
+                      size > 100 ? "bottom-1 left-1" : "bottom-0.5 left-0.5",
+                    )}
                     style={{
-                      fontSize: size > 100 ? "13px" : "11px",
                       color: "#ffffff", // Явно задаем чисто белый цвет для Tauri
                     }}
                   >
-                    {file.name}
+                    <Film size={size > 100 ? 16 : 12} />
                   </div>
                 )}
 
-              {/* Кнопка добавления */}
-              {onAddMedia &&
-                isLoaded &&
-                typeof stream.index !== "undefined" &&
-                stream.index ===
-                  (file.probeData?.streams.filter(
-                    (s) => s.codec_type === "video",
-                  ).length ?? 0) -
-                    1 && (
-                  <AddMediaButton
-                    file={file}
-                    onAddMedia={onAddMedia}
-                    isAdded={isAdded}
-                    size={size}
-                  />
-                )}
+                {/* Кнопка избранного */}
+                {!(
+                  isMultipleStreams &&
+                  typeof stream.index !== "undefined" &&
+                  stream.index !== 0
+                ) && <FavoriteButton file={file} size={size} type="media" />}
+
+                {/* Разрешение видео */}
+                {isLoaded &&
+                  !(
+                    isMultipleStreams &&
+                    typeof stream.index !== "undefined" &&
+                    stream.index !== 0
+                  ) && (
+                    <div
+                      className={`pointer-events-none absolute ${
+                        size > 100 ? "left-[28px]" : "left-[22px]"
+                      } rounded-xs bg-black/60 text-xs leading-[16px] ${size > 100 ? "bottom-1" : "bottom-0.5"} ${
+                        size > 100 ? "px-[4px] py-[2px]" : "px-[2px] py-0"
+                      }`}
+                      style={{
+                        fontSize: size > 100 ? "13px" : "11px",
+                        color: "#ffffff", // Явно задаем чисто белый цвет для Tauri
+                      }}
+                    >
+                      {formatResolution(stream.width ?? 0, stream.height ?? 0)}
+                    </div>
+                  )}
+
+                {/* Имя файла */}
+                {showFileName &&
+                  !(
+                    isMultipleStreams &&
+                    typeof stream.index !== "undefined" &&
+                    stream.index !== 0
+                  ) && (
+                    <div
+                      className={`absolute font-medium ${size > 100 ? "top-1" : "top-0.5"} ${
+                        size > 100 ? "left-1" : "left-0.5"
+                      } ${
+                        size > 100 ? "px-[4px] py-[2px]" : "px-[2px] py-0"
+                      } line-clamp-1 rounded-xs bg-black/60 text-xs leading-[16px] ${isMultipleStreams ? "max-w-[100%]" : "max-w-[60%]"}`}
+                      style={{
+                        fontSize: size > 100 ? "13px" : "11px",
+                        color: "#ffffff", // Явно задаем чисто белый цвет для Tauri
+                      }}
+                    >
+                      {file.name}
+                    </div>
+                  )}
+
+                {/* Кнопка добавления */}
+                {onAddMedia &&
+                  isLoaded &&
+                  typeof stream.index !== "undefined" &&
+                  stream.index ===
+                    (file.probeData?.streams.filter(
+                      (s) => s.codec_type === "video",
+                    ).length ?? 0) -
+                      1 && (
+                    <AddMediaButton
+                      file={file}
+                      onAddMedia={onAddMedia}
+                      isAdded={isAdded}
+                      size={size}
+                    />
+                  )}
+              </div>
             </div>
-          </div>
-        );
+          );
         })
       )}
     </div>
